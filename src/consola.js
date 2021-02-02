@@ -195,14 +195,15 @@ class Consola {
   _wrapLogFn (defaults, isRaw) {
     return (...args) => {
       if (paused) {
-        queue.push([this, defaults, args, isRaw])
+        queue.push([this, defaults, arguments, true])
         return
       }
-      return this._logFn(defaults, args, isRaw)
+
+      return this._logFn(defaults, arguments, true)
     }
   }
 
-  _logFn (defaults, args, isRaw) {
+  _logFn (defaults, args, isWrapped) {
     if (defaults.level > this.level) {
       return this._async ? Promise.resolve(false) : false
     }
@@ -214,7 +215,7 @@ class Consola {
     }, defaults)
 
     // Consume arguments
-    if (!isRaw && args.length === 1 && isLogObj(args[0])) {
+    if (!isWrapped && args.length === 1 && isLogObj(args[0])) {
       Object.assign(logObj, args[0])
     } else {
       logObj.args = Array.from(args)
